@@ -507,17 +507,17 @@ int main() {
     arbol.buscar_punto(puntito);
     cout<<"busqueda (3,1,4): "<<endl;
     arbol.buscar_punto(v1);
-  arbol.remover(v1);
-  arbol.remover(v3);
-  cout<<"post borrado:(3,1,4) y (5, 2,5) \n";
-  arbol.printDibujarArbol(arbol.root, 0);
+    arbol.remover(v1);
+    arbol.remover(v3);
+    cout<<"post borrado:(3,1,4) y (5, 2,5) \n";
+    arbol.printDibujarArbol(arbol.root, 0);
 
-  cout<<"Range Query Elemento: (6,1,4)"<<endl;
-  arbol.rangeQ(arbol.root->data, 3);
+    cout<<"Range Query Elemento: (6,1,4)"<<endl;
+    arbol.rangeQ(arbol.root->data, 3);
 
-  int prioridad_k = 3;
-  cout<<"Knn de (0,4,3) con k="<<prioridad_k<<endl;
-  arbol._knn(prioridad_k, arbol.root->data);
+    int prioridad_k = 3;
+    cout<<"Knn de (0,4,3) con k="<<prioridad_k<<endl;
+    arbol._knn(prioridad_k, arbol.root->data);
 
     return 0;
 }
