@@ -17,9 +17,8 @@ void printVecInt(vector<int> p) {
 
 
 //Clase menor
-template <class T>
-class menor
-{
+template<class T>
+class menor {
 public:
     inline bool operator()(T x, T y, int altura) {
         return x[altura] < y[altura];
@@ -27,9 +26,8 @@ public:
 };
 
 //Clase mayor
-template <class T>
-class mayor
-{
+template<class T>
+class mayor {
 public:
     inline bool operator()(T x, T y, int altura) {
         return x[altura] > y[altura];
@@ -40,17 +38,17 @@ typedef vector<int> vecInt;
 typedef menor<vecInt> menorIntVec;
 typedef pair<float, vecInt> pair_D_VecInt;
 
-template <class T>
-class Node
-{
+template<class T>
+class Node {
 public:
     Node(T x, int dim, int altura) {
         data.resize(dim);
-        for (int i=0; i<dim; i++)
+        for (int i = 0; i < dim; i++)
             data[i] = x[i];
         this->altura = altura;
         nodes[0] = nodes[1] = nullptr;
     }
+
     Node(int dim) {
         data.resize(dim);
         altura = 0;
@@ -58,12 +56,11 @@ public:
 
     int altura;
     T data;
-    Node* nodes[2];
+    Node *nodes[2];
 };
 
-//// ///////////////////////////////////////
-struct S
-{
+////////////////////////////////////////////
+struct S {
     float dist_S;
     vecInt punto_S;
 
@@ -71,21 +68,24 @@ struct S
         dist_S = i;
         punto_S = punto;
     }
-    friend bool operator< (S const& x, S const& y) { return x.dist_S < y.dist_S; }
+
+    friend bool operator<(S const &x, S const &y) { return x.dist_S < y.dist_S; }
 };
 
-class BPQ
-{
+class BPQ {
 public:
     priority_queue<S> _bpq;
-    BPQ(){
+
+    BPQ() {
         this->k = 0;
-        cont_elem=0;
+        cont_elem = 0;
     }
-    BPQ(int k){
+
+    BPQ(int k) {
         this->k = k;
-        cont_elem=0;
+        cont_elem = 0;
     }
+
     int k;
     int cont_elem;
 
@@ -93,12 +93,12 @@ public:
         return _bpq.size();
     }
 
-    float topBPQ(){
+    float topBPQ() {
         return _bpq.top().dist_S;
     }
 
-    void printBPQ(){
-        while(!emptyBPQ()) {
+    void printBPQ() {
+        while (!emptyBPQ()) {
             std::cout << topBPQ() << ' ';
             printVecInt(topVecBPQ());
             cout << endl;
@@ -111,59 +111,59 @@ public:
         this->k = _k;
     }
 
-    bool emptyBPQ(){
+    bool emptyBPQ() {
         return _bpq.empty();
     }
 
-    void insertBPQ(S data){
+    void insertBPQ(S data) {
         _bpq.push(data);
         cont_elem++;
         if (cont_elem > k) {
             deleteBPQ();
         }
     }
-    void deleteBPQ(){
+
+    void deleteBPQ() {
         _bpq.pop();
     }
 
-    float topDistBPQ(){
+    float topDistBPQ() {
         return _bpq.top().dist_S;
     }
-    vecInt topVecBPQ(){
+
+    vecInt topVecBPQ() {
         return _bpq.top().punto_S;
     }
 };
 
 
-
 //// ///////////////////////////////////////
-template <class T, class C>
-class KDTree
-{
+template<class T, class C>
+class KDTree {
 public:
     int dim;
     int totalNodes;
-    KDTree(int n_dim)
-    {
+
+    KDTree(int n_dim) {
         this->dim = n_dim;
         this->root = nullptr;
         totalNodes = 0;
     }
 
     bool allDiff(T data, T x) {
-        int temp=0;
+        int temp = 0;
         for (int i = 0; i < dim; ++i) {
             if (data[i] == x[i]) {
                 temp++;
             }
-            if (temp==dim) {
+            if (temp == dim) {
                 return false;
             }
         }
         return true;
     }
 
-    bool find(T x, Node<T>**& p, int& tempAltura) {
+    bool find(T x, Node<T> **&p, int &tempAltura) {
 //  (*p)->data != x
         for (
                 p = &root;
@@ -173,20 +173,18 @@ public:
         return !!(*p);
     }
 
-    void buscar_punto(T punto)
-    {
-        Node<T>** p;
+    void buscar_punto(T punto) {
+        Node<T> **p;
         int altura;
-        if(find(punto,p, altura)) {
-            cout<<"Se encontro el dato ";
+        if (find(punto, p, altura)) {
+            cout << "Se encontro el dato ";
             printVecInt((*p)->data);
-        }
-        else
-            cout<<"No se encontro el elemento\n";
+        } else
+            cout << "No se encontro el elemento\n";
     }
 
     bool insert(T x) {
-        Node<T>** p;
+        Node<T> **p;
         int tempAltura = 0;
         if (find(x, p, tempAltura))
             return 0;
@@ -196,33 +194,34 @@ public:
     }
 
     float calc2Dist(T P1, T P2) {
-        float sum=.0f;
+        float sum = .0f;
         for (int i = 0; i < dim; ++i) {
-            float diff = P1[i]-P2[i];
-            float diffPow = diff*diff;
-            sum+=diffPow;
+            float diff = P1[i] - P2[i];
+            float diffPow = diff * diff;
+            sum += diffPow;
         }
-        return (sqrt(sum))*1.f;
+        return (sqrt(sum)) * 1.f;
     }
 
     /* nn BEGIN */
     BPQ s_nn;
+
     void _nn(T key) {
-        Node<T>* m_nnc= nullptr;
-        double bst_dst= numeric_limits<double>::infinity();
+        Node<T> *m_nnc = nullptr;
+        double bst_dst = numeric_limits<double>::infinity();
         S m_dst_p(bst_dst, key);
-        _nnAux(root, m_nnc, m_dst_p , 0, key);
+        _nnAux(root, m_nnc, m_dst_p, 0, key);
         printVecInt(m_dst_p.punto_S);
-        cout<<m_dst_p.dist_S<<endl;
+        cout << m_dst_p.dist_S << endl;
     }
 
-    void _nnAux(Node<T> *curr, Node<T>* m_nnc, S &m_dst_p, int depth, T key) {
+    void _nnAux(Node<T> *curr, Node<T> *m_nnc, S &m_dst_p, int depth, T key) {
         if (!curr) {
             return;
         }
-        float dist_nn = calc2Dist(curr->data, key)*1.f;
-        if(dist_nn < m_dst_p.dist_S){
-            m_dst_p.dist_S= dist_nn;
+        float dist_nn = calc2Dist(curr->data, key) * 1.f;
+        if (dist_nn < m_dst_p.dist_S) {
+            m_dst_p.dist_S = dist_nn;
             m_nnc = curr;
             m_dst_p.punto_S = curr->data;
         }
@@ -232,9 +231,8 @@ public:
 
         if (key[axis] < curr->data[axis]) {
             right = false;
-            _nnAux(curr->nodes[0], m_nnc , m_dst_p,++depth, key);
-        }
-        else {
+            _nnAux(curr->nodes[0], m_nnc, m_dst_p, ++depth, key);
+        } else {
             right = true;
             _nnAux(curr->nodes[1], m_nnc, m_dst_p, ++depth, key);
         }
@@ -244,10 +242,9 @@ public:
         //       cout << endl;
         if (fabs_n < m_dst_p.dist_S) {
             if (right) {
-                _nnAux(curr->nodes[0], m_nnc, m_dst_p,++depth, key);
-            }
-            else {
-                _nnAux(curr->nodes[1], m_nnc,m_dst_p,++depth, key);
+                _nnAux(curr->nodes[0], m_nnc, m_dst_p, ++depth, key);
+            } else {
+                _nnAux(curr->nodes[1], m_nnc, m_dst_p, ++depth, key);
             }
         }
     }
@@ -256,17 +253,18 @@ public:
 
     /* knn vecinos BEGIN */
     BPQ nnc;
-    void _knn(int k,  T key) {
+
+    void _knn(int k, T key) {
         nnc.set_k(k);
         _knnAux(root, nnc, k, 0, key);
         nnc.printBPQ();
     }
 
-    void _knnAux(Node<T> *curr, BPQ& nnc, int k, int depth, T key) {
+    void _knnAux(Node<T> *curr, BPQ &nnc, int k, int depth, T key) {
         if (!curr) {
             return;
         }
-        float dist_nn = calc2Dist(curr->data, key)*1.f;
+        float dist_nn = calc2Dist(curr->data, key) * 1.f;
 //    cout << "Ref: ";  printVecInt(key);
 //    cout << "PuntoCurr: "; printVecInt(curr->data);
 //    cout << "distEucl: " << dist_nn << endl;
@@ -280,8 +278,7 @@ public:
         if (key[axis] < curr->data[axis]) {
             right = false; //si mi nodo es menor a la izq
             _knnAux(curr->nodes[0], nnc, k, ++depth, key);
-        }
-        else {
+        } else {
             right = true;
             _knnAux(curr->nodes[1], nnc, k, ++depth, key);
         }
@@ -289,12 +286,11 @@ public:
         int fabs_n = abs(curr->data[axis] - key[axis]);
 //    cout << "nnc.topBPQ(): " << nnc.topBPQ() << endl;
 //    cout << "PuntoCurr: "; printVecInt(curr->data);
- //       cout << endl;
+        //       cout << endl;
         if (fabs_n < nnc.topDistBPQ()) {
             if (right) {
                 _knnAux(curr->nodes[0], nnc, k, ++depth, key);
-            }
-            else {
+            } else {
                 _knnAux(curr->nodes[1], nnc, k, ++depth, key);
             }
         }
@@ -303,19 +299,20 @@ public:
 
     /* range query BEGIN */
     BPQ nncQ;
-    void rangeQ(T x, int distQ){
-        nncQ.set_k(totalNodes+2);
-        _rangeQ_Aux(root, nncQ, totalNodes,0, x, distQ);
-       // printVecInt(nncQ.topVecBPQ());
+
+    void rangeQ(T x, int distQ) {
+        nncQ.set_k(totalNodes + 2);
+        _rangeQ_Aux(root, nncQ, totalNodes, 0, x, distQ);
+        // printVecInt(nncQ.topVecBPQ());
         nncQ.printBPQ();
     }
 
-    void _rangeQ_Aux(Node<T> *curr, BPQ& nncQ, int k, int depth, T key, int distQ) {
+    void _rangeQ_Aux(Node<T> *curr, BPQ &nncQ, int k, int depth, T key, int distQ) {
         if (!curr) {
             return;
         }
-        float dist_nn = calc2Dist(curr->data, key)*1.f;
-        if (dist_nn<=distQ) {
+        float dist_nn = calc2Dist(curr->data, key) * 1.f;
+        if (dist_nn <= distQ) {
             nncQ.insertBPQ(S(dist_nn, curr->data));
         }
 
@@ -325,8 +322,7 @@ public:
         if (key[axis] < curr->data[axis]) {
             right = false;
             _rangeQ_Aux(curr->nodes[0], nncQ, k, ++depth, key, distQ);
-        }
-        else {
+        } else {
             right = true;
             _rangeQ_Aux(curr->nodes[1], nncQ, k, ++depth, key, distQ);
         }
@@ -339,9 +335,10 @@ public:
                 _rangeQ_Aux(curr->nodes[1], nncQ, k, ++depth, key, distQ);
         }
     }
+
     /* range query END */
 
-    Node<T>** rep(Node<T> **p) {
+    Node<T> **rep(Node<T> **p) {
         bool dir = rand() % 2;
         for (
                 p = &((*p)->nodes[dir]);
@@ -352,33 +349,31 @@ public:
     }
 
 
-    bool remover(T x)
-    {
-        int altura=0;
-        Node<T>** p;
-        if (!find(x, p,altura)) return false;
-        if ((*p)->nodes[0] && (*p)->nodes[1])
-        {
-            Node<T>** q = rep(p);
+    bool remover(T x) {
+        int altura = 0;
+        Node<T> **p;
+        if (!find(x, p, altura)) return false;
+        if ((*p)->nodes[0] && (*p)->nodes[1]) {
+            Node<T> **q = rep(p);
             (*p)->data = (*q)->data;
 
             p = q;
         }
-        Node<T>* t = *p;
+        Node<T> *t = *p;
         *p = (*p)->nodes[!(*p)->nodes[0]];
         delete t;
         totalNodes--;
         return false;
     }
 
-    void printDibujarArbol(Node<T>* p, int level) {
+    void printDibujarArbol(Node<T> *p, int level) {
         if (!p)
             return;
         printDibujarArbol(p->nodes[1], level + 1);
         for (int i = 0; i < level; i++) {
             cout << "\t";
         }
-        cout<<"|";
+        cout << "|";
         for (int i = 0; i < dim; ++i) {
             cout << p->data[i] << "|";
         }
@@ -388,11 +383,11 @@ public:
     }
 
 
-
     void inOrder();
+
     //Elementos
     C cmp; //Function Object
-    Node<T>* root;
+    Node<T> *root;
 };
 
 int main() {
@@ -475,30 +470,30 @@ int main() {
     arbol.insert(v12);
 
     vecInt puntito(3);
-    puntito[0]=0;
-    puntito[1]=4;
-    puntito[2]=3;
+    puntito[0] = 0;
+    puntito[1] = 4;
+    puntito[2] = 3;
 
     arbol.printDibujarArbol(arbol.root, 0);
-    cout<<"busqueda: (0,4,3): "<<endl;
+    cout << "busqueda: (0,4,3): " << endl;
     arbol.buscar_punto(puntito);
-    cout<<"busqueda (3,1,4): "<<endl;
+    cout << "busqueda (3,1,4): " << endl;
     arbol.buscar_punto(v1);
     arbol.remover(v1);
     arbol.remover(v3);
-    cout<<"post borrado:(3,1,4) y (5, 2,5) \n";
+    cout << "post borrado:(3,1,4) y (5, 2,5) \n";
     arbol.printDibujarArbol(arbol.root, 0);
 
-    cout<<"Range Query Elemento: (0,4,3)"<<endl;
+    cout << "Range Query Elemento: (0,4,3)" << endl;
     //arbol.rangeQ(arbol.root->data, 3);
     arbol.rangeQ(puntito, 9);
 
     int prioridad_k = 110;
-    cout<<"knn de (0,4,3) con k="<<prioridad_k<<endl;
+    cout << "knn de (0,4,3) con k=" << prioridad_k << endl;
     arbol._knn(prioridad_k, puntito);
 
-    cout<<"nn de (0,4,3) "<<endl;
-    arbol._nn( puntito);
+    cout << "nn de (0,4,3) " << endl;
+    arbol._nn(puntito);
 
     return 0;
 }
