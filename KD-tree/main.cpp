@@ -3,6 +3,7 @@
 #include <stack>
 #include <queue>
 #include <cmath>
+#include <limits>
 
 
 using namespace std;
@@ -92,7 +93,7 @@ public:
         return _bpq.size();
     }
 
-    int topBPQ(){
+    float topBPQ(){
         return _bpq.top().dist_S;
     }
 
@@ -125,7 +126,7 @@ public:
         _bpq.pop();
     }
 
-    int topDistBPQ(){
+    float topDistBPQ(){
         return _bpq.top().dist_S;
     }
     vecInt topVecBPQ(){
@@ -148,24 +149,6 @@ public:
         this->root = nullptr;
         totalNodes = 0;
     }
-    /*~BinTree()
-    {
-        T izq, der;
-        Node<T>* tmp_izq = root;
-        for (; tmp_izq->nodes[0]; tmp_izq = tmp_izq->nodes[0]);
-        izq = tmp_izq->data;
-
-        Node<T>* tmp_der = root;
-        for (; tmp_der->nodes[1]; tmp_der = tmp_der->nodes[1]);
-        der = tmp_der->data;
-
-        while (izq != der)
-        {
-            erase(izq);
-            izq++;
-        }
-        erase(izq);
-    }*/
 
     bool allDiff(T data, T x) {
         int temp=0;
@@ -194,8 +177,10 @@ public:
     {
         Node<T>** p;
         int altura;
-        if(find(punto,p, altura))
+        if(find(punto,p, altura)) {
+            cout<<"Se encontro el dato ";
             printVecInt((*p)->data);
+        }
         else
             cout<<"No se encontro el elemento\n";
     }
@@ -220,10 +205,59 @@ public:
         return (sqrt(sum))*1.f;
     }
 
+    /* nn BEGIN */
+    BPQ s_nn;
+    void _nn(T key) {
+        Node<T>* m_nnc= nullptr;
+        double bst_dst= numeric_limits<double>::infinity();
+        S m_dst_p(bst_dst, key);
+        _nnAux(root, m_nnc, m_dst_p , 0, key);
+        printVecInt(m_dst_p.punto_S);
+        cout<<m_dst_p.dist_S<<endl;
+    }
+
+    void _nnAux(Node<T> *curr, Node<T>* m_nnc, S &m_dst_p, int depth, T key) {
+        if (!curr) {
+            return;
+        }
+        float dist_nn = calc2Dist(curr->data, key)*1.f;
+        if(dist_nn < m_dst_p.dist_S){
+            m_dst_p.dist_S= dist_nn;
+            m_nnc = curr;
+            m_dst_p.punto_S = curr->data;
+        }
+
+        int axis = depth % dim;
+        bool right = false;
+
+        if (key[axis] < curr->data[axis]) {
+            right = false;
+            _nnAux(curr->nodes[0], m_nnc , m_dst_p,++depth, key);
+        }
+        else {
+            right = true;
+            _nnAux(curr->nodes[1], m_nnc, m_dst_p, ++depth, key);
+        }
+
+        int fabs_n = abs(curr->data[axis] - key[axis]);
+
+        //       cout << endl;
+        if (fabs_n < m_dst_p.dist_S) {
+            if (right) {
+                _nnAux(curr->nodes[0], m_nnc, m_dst_p,++depth, key);
+            }
+            else {
+                _nnAux(curr->nodes[1], m_nnc,m_dst_p,++depth, key);
+            }
+        }
+    }
+    /* nn  END */
+
+
     /* knn vecinos BEGIN */
     BPQ nnc;
     void _knn(int k,  T key) {
-        nnc.set_k(k+1);
+        nnc.set_k(k);
         _knnAux(root, nnc, k, 0, key);
         nnc.printBPQ();
     }
@@ -244,7 +278,7 @@ public:
         bool right = false;
 
         if (key[axis] < curr->data[axis]) {
-            right = false;
+            right = false; //si mi nodo es menor a la izq
             _knnAux(curr->nodes[0], nnc, k, ++depth, key);
         }
         else {
@@ -361,63 +395,6 @@ public:
     Node<T>* root;
 };
 
-
-//template<class T, class C>
-//void BinTree<T, C>::rep(Node<T>**& q)
-//{
-//	srand(time(NULL));
-//	int num = rand() % 2;
-//	//int num = 1;
-//	if (num)
-//	{
-//		q = &((*q)->nodes[1]);
-//		while ((*q)->nodes[0]) q = &((*q)->nodes[0]);
-//	}
-//	else
-//	{
-//		q = &((*q)->nodes[0]);
-//		while ((*q)->nodes[1])q = &((*q)->nodes[1]);
-//	}
-//}
-//
-//template<class T, class C>
-//bool BinTree<T, C>::erase(T x)
-//{
-//	Node<T>** p;
-//	if (!find(x, p))
-//		return 0;
-//	//CASO 2
-//	if ((*p)->nodes[0] && (*p)->nodes[1])
-//	{
-//		Node<T>** q = p;
-//		rep(q);
-//		(*p)->data = (*q)->data;
-//		p = q;
-//	}
-//	//CASO 0,1
-//	Node<T>* t = *p;
-//	*p = (*p)->nodes[!(*p)->nodes[0]];
-//	delete t;
-//	//std::cout << t->data << std::endl;
-//	/*if ((*p)->nodes[1])
-//		*p = (*p)->nodes[1];
-//	else
-//		*p = (*p)->nodes[0];*/
-//
-//	return 1;
-//}
-//
-
-//
-//
-//void print_lines()
-//{
-//	cout << endl;
-//	for (int i = 0; i < 50; i++)
-//		cout << "-";
-//	cout << endl << endl;
-//}
-
 int main() {
 
     KDTree<
@@ -512,12 +489,25 @@ int main() {
     cout<<"post borrado:(3,1,4) y (5, 2,5) \n";
     arbol.printDibujarArbol(arbol.root, 0);
 
+<<<<<<< HEAD
+    cout<<"Range Query Elemento: (0,4,3)"<<endl;
+    //arbol.rangeQ(arbol.root->data, 3);
+    arbol.rangeQ(puntito, 9);
+
+    int prioridad_k = 110;
+    cout<<"knn de (0,4,3) con k="<<prioridad_k<<endl;
+    arbol._knn(prioridad_k, puntito);
+
+    cout<<"nn de (0,4,3) "<<endl;
+    arbol._nn( puntito);
+=======
     cout<<"Range Query Elemento: (6,1,4)"<<endl;
     arbol.rangeQ(arbol.root->data, 3);
 
     int prioridad_k = 3;
     cout<<"Knn de (0,4,3) con k="<<prioridad_k<<endl;
     arbol._knn(prioridad_k, arbol.root->data);
+>>>>>>> 97bf85461434bc763c8873a5b5003c76bae2d724
 
     return 0;
 }
