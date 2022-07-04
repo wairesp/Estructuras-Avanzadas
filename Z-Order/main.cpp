@@ -7,7 +7,7 @@
 #include <math.h>
 #include <chrono>
 #include <queue>
-#include <bitset>
+
 
 
 using namespace std;
@@ -16,8 +16,7 @@ using namespace std;
 #define DIMENSIONES 10
 
 
-// Function to find the transpose
-// of the matrix mat[]
+// Function to find the transpose of matrix
 vector<vector<int> > transpose(
         vector<vector<int> > mat,
         int row, int col)
@@ -78,8 +77,8 @@ void print_matriz(vector<vector<int>> matriz,int filas, int columnas){
     cout<<"\nprint: "<<endl;
     for (int i = 0; i < filas; i++){
         for (int j = 0; j < columnas; j++)
-            cout << matriz[i][j] << " ";
-        cout << '\n';
+            cout << matriz[i][j] << " | ";
+        cout << "\n";
     }
 }
 
@@ -231,9 +230,6 @@ void myKNN2(int k, int i1, vector<int> mymat){
     vecinitos.printBPQ();
 }
 
-
-
-
 uint32_t calcZOrder(uint16_t xPos, uint16_t yPos)
 {
     static const uint32_t MASKS[] = {0x55555555, 0x33333333, 0x0F0F0F0F, 0x00FF00FF};
@@ -271,11 +267,11 @@ int zorder_y_of(int index) {
     return zorder_x_of(index>>1);
 }
 
-template<typename M, typename CBACK>
-void zorder2(const M& m, int size_1, int size_2, CBACK cback, vector<int> &myvec)
+template<typename M>
+void ZOrder(const M& m, int size_1, int size_2, vector<int> &myvec)
 {
     for (int i=0; i<size_1*size_2; i++) {
-        cback(m[zorder_y_of(i)][zorder_x_of(i)]);
+        m[zorder_y_of(i)][zorder_x_of(i)];
         myvec.push_back(m[zorder_y_of(i)][zorder_x_of(i)]);
     }
 }
@@ -284,48 +280,32 @@ int main()
 {
     vector<vector<int>> my_vector(ELEMENTOS, vector<int>(DIMENSIONES));
 
-    my_vector = {
-            {1, 2, 3},
-            {4,5,6},
-            {7,8,9},
-            {10,11,12}
-    };
-
-    //myKNN(2,my_vector[1],my_vector);
-
-    vector<long long> myZOrder;
+    std::random_device rd;  //Will be used to obtain a seed for the random number engine
+    std::mt19937 gen(rd()); //Standard mersenne_twister_engine seeded with rd()
+    std::uniform_int_distribution<> dis(1, 10);//numeros entre 1 y 100
+    std::uniform_int_distribution<> punto(0, 19999);
 
 
+    for (int i = 0; i < ELEMENTOS; ++i)//5000 elementos
+        for (int j = 0; j < DIMENSIONES; ++j)//10 dim
+            my_vector[i][j] = dis(gen);
 
-//    for (int row = 0; row < ELEMENTOS; row++) {
-//        for (int col = 0; col < DIMENSIONES; col++) {
-//            calcZOrder(my_vector[row][col],my_vector[row][col+1]);
-//            calcZOrder(my_vector[row][0],my_vector[i2][1]);
-//            calcZOrder(my_vector[i][0],my_vector[i2+1][1]);
-//            calcZOrder(my_vector[i+1][0],my_vector[i2+1][1]);
-//        }
-//    }
 
-//    for (int i2 = 0; i2 < ELEMENTOS; i2+=2) {
-//        for (int i = 0; i < ELEMENTOS; i+=2) {
-//            calcZOrder(my_vector[i][0],my_vector[i2][1]);
-//            calcZOrder(my_vector[i][0],my_vector[i2][1]);
-//            calcZOrder(my_vector[i][0],my_vector[i2+1][1]);
-//            calcZOrder(my_vector[i+1][0],my_vector[i2+1][1]);
-//        }
-//    }
-    //my_vector=sortCol(my_vector,ELEMENTOS,DIMENSIONES);
+    myKNN(5,my_vector[3],my_vector);
 
-    vector<int> myZorder2;
-    zorder2(my_vector,4,3,print,myZorder2);
+    my_vector=sortCol(my_vector,ELEMENTOS,DIMENSIONES);
+    //print_matriz(my_vector,ELEMENTOS,DIMENSIONES);
+
+    vector<int> myZorder;
+    vector<vector<int>> my_data_copy = my_vector;
+
+    ZOrder(my_data_copy,ELEMENTOS,DIMENSIONES,myZorder);
 
     vector<int> dato;
     dato.push_back(200);
-//
-    myKNN2(5,5,myZorder2);
 
-    //my_vector=sortCol(my_vector,ELEMENTOS,DIMENSIONES);
-    //print_matriz(my_vector,ELEMENTOS,DIMENSIONES);
+    myKNN2(5,5,myZorder);
+
 
 
     return 0;
