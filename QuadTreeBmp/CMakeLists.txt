@@ -3,5 +3,4 @@ project(myonlyTest)
 
 set(CMAKE_CXX_STANDARD 17)
 
-add_executable(myonlyTest main.cpp)
 add_executable(bmp bmp.cpp bitmap.h bitmap.cpp)
