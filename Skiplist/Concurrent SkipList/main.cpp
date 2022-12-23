@@ -22,27 +22,37 @@ SkipList<int> skiplist(20, 0.5);
 
 void skiplist_add(size_t start, size_t end){
     if(end >= mydata.size()) end = mydata.size();
-    if(start == end) skiplist.add(mydata[start], mydata[start]);
+    if(start == end) skiplist.insert(mydata[start], mydata[start]);
     for(size_t i = start; i < end; i++){
-        skiplist.add(mydata[i], mydata[i]);
+        skiplist.insert(mydata[i], mydata[i]);
     }
 }
 
 void skiplist_remove(size_t start, size_t end){
     if(end >= delete_list.size()) end = delete_list.size();
-    if(start == end) skiplist.remove(delete_list[start]);
+    if(start == end) skiplist.borrar(delete_list[start]);
     for(size_t i = start; i < end; i++){
-        skiplist.remove(delete_list[i]);
+        skiplist.borrar(delete_list[i]);
     }
 }
 
-void skiplist_search(size_t start, size_t end){
+void skiplist_search(size_t start, size_t end, bool printflag){
     if(end >= search_list.size()) end = search_list.size();
     if(start == end) end++;
-    for(size_t i = start; i < end; i++){
-        string s = skiplist.search(search_list[i]);
-        if(s.empty()) s = "Not Found";
-        //cout << "Searching for " << search_list[i] << " Search value: " << s << endl;
+    if(printflag == 0){
+        for(size_t i = start; i < end; i++){
+            string s = skiplist.search(search_list[i]);
+            //if(s.empty()) s = "Not Found";
+            //cout << s << endl;
+        }
+    }
+    else
+    {
+        for(size_t i = start; i < end; i++){
+            string s = skiplist.search(search_list[i]);
+            //if(s.empty()) s = "Not Found";
+            cout << s << endl;
+        }
     }
 }
 
@@ -89,16 +99,34 @@ int main(){
         th.join();
     }
 
-
     cout << "\n(insert)Skiplist: " << endl;
 
     skiplist.display();
     threads.clear();
 
-    cout << "\ndeletion elements" << endl;
+    cout << "\nelementos a buscar" << endl;
 
     std::chrono::time_point<std::chrono::high_resolution_clock> tstart1, end1;
     tstart1 = std::chrono::high_resolution_clock::now();
+
+    for (auto i = search_list.begin(); i != search_list.end(); ++i)
+        std::cout << *i << ' ';
+
+    // search
+    chunk_size = ceil(float(delete_list.size()) / num_threads);
+    for (size_t i = 0; i < delete_list.size(); i = i + chunk_size) {
+        threads.push_back(thread(skiplist_remove, i, i + chunk_size));
+    }
+    for (auto &th: threads) {
+        th.join();
+    }
+
+    cout << "\n\n(search)Skiplist" << endl;
+    threads.clear();
+
+
+    cout << "\nelementos a eliminiar" << endl;
+
 
     for (auto i = delete_list.begin(); i != delete_list.end(); ++i)
         std::cout << *i << ' ';
@@ -115,16 +143,13 @@ int main(){
     cout << "\n\n(delete)Skiplist" << endl;
 
     skiplist.display();
-
     threads.clear();
 
-    std::chrono::time_point<std::chrono::high_resolution_clock> tstart2, end2;
-    tstart2 = std::chrono::high_resolution_clock::now();
 
     // search
     chunk_size = ceil(float(search_list.size()) / num_threads);
     for(size_t i = 0; i < search_list.size(); i = i + chunk_size){
-        threads.push_back(thread(skiplist_search, i, i+chunk_size));
+        threads.push_back(thread(skiplist_search, i, i+chunk_size, 1));
     }
     for (auto &th : threads) {
         th.join();
@@ -223,7 +248,7 @@ int main(){
         // search
         chunk_size = ceil(float(search_list.size()) / num_threads);
         for(size_t i = 0; i < search_list.size(); i = i + chunk_size){
-            threads.push_back(thread(skiplist_search, i, i+chunk_size));
+            threads.push_back(thread(skiplist_search, i, i+chunk_size, 0));
         }
         for (auto &th : threads) {
             th.join();
